@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Retro Games Store</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+body{
+margin:0;
+font-family:'Poppins',sans-serif;
+background:#0a0a0a;
+color:#fff;
+}
+
+header{
+text-align:center;
+padding:30px;
+font-size:32px;
+font-weight:600;
+color:#00aaff;
+text-shadow:0 0 15px #00aaff;
+}
+
+.container{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+gap:30px;
+padding:30px;
+}
+
+.card{
+background:#111;
+border-radius:20px;
+overflow:hidden;
+border:1px solid #00aaff33;
+box-shadow:0 0 15px #00aaff22;
+transition:0.3s;
+}
+
+.card:hover{
+transform:translateY(-10px);
+box-shadow:0 0 25px #00aaff;
+}
+
+.card img{
+width:100%;
+height:300px;
+object-fit:cover;
+}
+
+.card-content{
+padding:20px;
+}
+
+.card h3{
+margin:0 0 10px 0;
+color:#00aaff;
+}
+
+.desc{
+font-size:14px;
+opacity:0.8;
+}
+
+.price{
+font-size:22px;
+color:#00ffaa;
+margin-top:15px;
+font-weight:600;
+text-shadow:0 0 10px #00ffaa;
+}
+
+.topbar{
+text-align:center;
+margin-bottom:20px;
+}
+
+.admin-btn{
+background:#00aaff;
+border:none;
+padding:10px 20px;
+border-radius:8px;
+cursor:pointer;
+font-weight:600;
+color:#000;
+box-shadow:0 0 15px #00aaff;
+}
+
+.panel{
+display:none;
+background:#111;
+margin:20px;
+padding:20px;
+border-radius:15px;
+border:1px solid #00aaff55;
+}
+
+.panel h2{
+color:#00aaff;
+margin-top:0;
+}
+
+.panel input{
+width:100%;
+padding:8px;
+margin-bottom:10px;
+border-radius:6px;
+border:none;
+background:#1c1c1c;
+color:#fff;
+}
+
+.save-btn{
+background:#00ffaa;
+border:none;
+padding:10px;
+border-radius:8px;
+font-weight:600;
+cursor:pointer;
+width:100%;
+}
+</style>
+</head>
+<body>
+
+<header>🎮 Retro Games Store</header>
+
+<div class="topbar">
+<button class="admin-btn" onclick="openPanel()">Panel Admin</button>
+</div>
+
+<div class="panel" id="adminPanel">
+<h2>Editar Precios</h2>
+<div id="adminInputs"></div>
+<button class="save-btn" onclick="savePrices()">Guardar Cambios</button>
+</div>
+
+<div class="container" id="gamesContainer"></div>
+
+<script>
+
+const password = "admin123";
+
+let games = [
+{ name:"Call of Duty Black Ops Cold War", desc:"Disponible para PS4 y PS5", price:27000, img:"img/codcw.jpg" },
+{ name:"EA Sports FC 26", desc:"Disponible para PS4 y PS5", price:30000, img:"img/fc26.jpg" },
+{ name:"Grand Theft Auto V", desc:"Disponible para PS4 y PS5", price:29000, img:"img/gtav.jpg" },
+{ name:"Mortal Kombat 11", desc:"Disponible para PS4 y PS5", price:17600, img:"img/mk11.jpg" },
+{ name:"NBA 2K26", desc:"Disponible para PS4 y PS5", price:29500, img:"img/nba2k26.jpg" },
+{ name:"The Last of Us Part II", desc:"Disponible para PS4 y PS5", price:35200, img:"img/tlou2.jpg" },
+{ name:"UFC 5", desc:"Disponible para PS5", price:23200, img:"img/ufc5.jpg" },
+{ name:"Outlast", desc:"Disponible para PS4 y PS5", price:12700, img:"img/outlast.jpg" },
+{ name:"Five Nights at Freddy’s Security Breach", desc:"Disponible para PS4 y PS5", price:28000, img:"img/fnaf.jpg" },
+{ name:"The Forest", desc:"Disponible para PS4 y PS5", price:14600, img:"img/forest.jpg" },
+{ name:"Little Nightmares I & II", desc:"Disponible para PS4 y PS5", price:22700, img:"img/littlenightmares.jpg" },
+{ name:"Jurassic World Evolution", desc:"Disponible para PS4 y PS5", price:16900, img:"img/jurassic.jpg" },
+{ name:"Horizon Forbidden West", desc:"Disponible para PS4 y PS5", price:27000, img:"img/horizon.jpg" },
+{ name:"Borderlands Legendary Collection", desc:"Disponible para PS4 y PS5", price:21000, img:"img/borderlands.jpg" },
+{ name:"MotoGP 23", desc:"Disponible para PS4 y PS5", price:14600, img:"img/motogp23.jpg" }
+];
+
+// Cargar datos guardados
+const saved = localStorage.getItem("retroGames");
+if(saved){
+games = JSON.parse(saved);
+}
+
+const container = document.getElementById("gamesContainer");
+const adminPanel = document.getElementById("adminPanel");
+const adminInputs = document.getElementById("adminInputs");
+
+function renderGames(){
+container.innerHTML="";
+games.forEach(game=>{
+container.innerHTML+=`
+<div class="card">
+<img src="${game.img}" alt="${game.name}">
+<div class="card-content">
+<h3>${game.name}</h3>
+<div class="desc">${game.desc}</div>
+<div class="price">$${game.price.toLocaleString()}</div>
+</div>
+</div>
+`;
+});
+}
+
+function openPanel(){
+const pass = prompt("Ingresar contraseña:");
+if(pass !== password){
+alert("Contraseña incorrecta");
+return;
+}
+
+adminPanel.style.display="block";
+adminInputs.innerHTML="";
+
+games.forEach((game,index)=>{
+adminInputs.innerHTML+=`
+<label>${game.name}</label>
+<input type="number" value="${game.price}" onchange="updatePrice(${index},this.value)">
+`;
+});
+}
+
+function updatePrice(index,value){
+games[index].price=parseInt(value);
+}
+
+function savePrices(){
+localStorage.setItem("retroGames", JSON.stringify(games));
+alert("Precios guardados correctamente");
+renderGames();
+}
+
+renderGames();
+
+</script>
+
+</body>
+</html>
